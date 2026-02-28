@@ -3,348 +3,421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sürecin Başlangıcı</title>
+    <title>Sinyal Senkronizasyonu: 16.02</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;400;700&family=Inter:wght@100;300;600&display=swap');
+
         :root {
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.6);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-shadow: rgba(0, 0, 0, 0.4);
+            --bg-deep: #030305;
+            --accent: #f59e0b;
+            --accent-dim: rgba(245, 158, 11, 0.2);
+            --accent-glow: rgba(245, 158, 11, 0.1);
+            --text-main: #e2e8f0;
+            --glass: rgba(10, 10, 15, 0.85);
+            --border: rgba(245, 158, 11, 0.15);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
             color: var(--text-main);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
-            /* Modern, hareketli ve derinlikli bir gradient arka plan */
-            background: linear-gradient(135deg, #09090b 0%, #171720 50%, #0c1222 100%);
-            background-size: 200% 200%;
-            animation: bgShift 15s ease infinite;
+            min-height: 100vh;
+            width: 100vw;
         }
 
-        @keyframes bgShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* --- DEEP COSMOS BACKGROUND --- */
+        #starfield {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.8;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            padding: 2rem;
+        /* Nebula Clouds - High Performance CSS Gradients */
+        .nebula {
+            position: fixed;
+            width: 150vw;
+            height: 150vh;
+            filter: blur(100px);
+            z-index: 1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        .nebula-1 {
+            background: radial-gradient(circle, #ea580c 0%, transparent 70%);
+            top: -25%; left: -25%;
+            animation: nebulaFloat 40s linear infinite;
+        }
+        .nebula-2 {
+            background: radial-gradient(circle, #4338ca 0%, transparent 70%);
+            bottom: -25%; right: -25%;
+            animation: nebulaFloat 60s linear reverse infinite;
+        }
+
+        @keyframes nebulaFloat {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(5%, 5%) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.05) 51%);
+            background-size: 100% 4px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* --- MAIN INTERFACE --- */
+        .interface {
+            position: relative;
+            z-index: 10;
+            width: 95%;
+            max-width: 900px;
+            max-height: 95vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 3rem;
-            z-index: 10;
+            gap: 1.5rem;
+            animation: entryFaster 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            padding: 10px;
         }
 
-        /* Glassmorphism (Cam Efekti) Ortak Sınıfı */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px var(--glass-shadow);
+        @keyframes entryFaster {
+            from { opacity: 0; transform: scale(0.96) translateY(10px); filter: brightness(2) blur(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: brightness(1) blur(0); }
         }
 
-        /* Gizemli Metin Bölümü */
-        .info-card {
-            max-width: 800px;
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: 2px;
             padding: 2.5rem;
-            text-align: center;
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            transition: border-color 1s ease, box-shadow 1s ease;
         }
 
-        /* Arka plan ışıltısı */
-        .info-card::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at center, rgba(56, 189, 248, 0.05) 0%, transparent 50%);
-            z-index: -1;
+        /* Breathing Effect */
+        .glass-card.pulse {
+            border-color: rgba(245, 158, 11, 0.35);
+            box-shadow: 0 0 60px rgba(245, 158, 11, 0.1);
         }
 
-        .info-card h1 {
-            font-size: 2.2rem;
-            font-weight: 300;
-            letter-spacing: 2px;
+        /* Resonance Flicker */
+        .resonance-flicker {
+            animation: flicker 0.15s ease-in-out;
+        }
+        @keyframes flicker {
+            0% { opacity: 1; filter: brightness(1); }
+            50% { opacity: 0.8; filter: brightness(1.5) contrast(1.2); }
+            100% { opacity: 1; filter: brightness(1); }
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
-            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--accent);
+            opacity: 0.7;
         }
 
-        .info-card p {
-            font-size: 1.1rem;
+        .sync-pulse {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.4; } }
+
+        h1 {
+            font-weight: 200;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            font-size: 1.6rem;
+            margin-bottom: 1.2rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        p#main-text {
+            font-size: 0.9rem;
             line-height: 1.8;
-            color: var(--text-muted);
-            font-weight: 300;
+            color: #94a3b8;
             text-align: justify;
             text-align-last: center;
+            font-weight: 300;
         }
 
-        /* Sayaç Bölümü */
-        .counter-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 1.5rem;
-            width: 100%;
-        }
-
-        .counter-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .counter-box:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(56, 189, 248, 0.3);
-            box-shadow: 0 25px 50px var(--glass-shadow), 0 0 20px rgba(56, 189, 248, 0.1);
-        }
-
-        .value {
-            font-size: 4rem;
-            font-weight: 700;
-            font-family: 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            color: #fff;
-            text-shadow: 0 0 20px var(--accent-glow);
-            margin-bottom: 0.5rem;
-            font-variant-numeric: tabular-nums; /* Sayıların genişliğini sabitler, titremeyi önler */
-        }
-
-        .label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+        .highlight {
             color: var(--accent);
-            opacity: 0.8;
             font-weight: 600;
         }
 
-        /* Çıkış Ekranı */
-        #exit-screen {
+        /* Counter Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .unit-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 1.2rem 0.4rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .unit-box:hover {
+            background: rgba(245, 158, 11, 0.08);
+            border-color: var(--accent);
+        }
+
+        .unit-box .val {
+            display: block;
+            font-size: 2.2rem;
+            font-weight: 400;
+            font-family: 'JetBrains Mono', monospace;
+            color: #fff;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        /* Number update animation */
+        .val.changing {
+            transform: scale(1.05);
+            filter: brightness(1.5);
+        }
+
+        .unit-box .label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+
+        .access-control {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .key-input {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.7rem 1.5rem;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            transition: 0.4s;
+            width: 180px;
+            font-size: 0.8rem;
+        }
+
+        .key-input:focus { width: 280px; border-color: var(--accent); background: rgba(245, 158, 11, 0.05); }
+
+        #termination-screen {
             display: none;
             position: fixed;
             inset: 0;
-            background-color: #000;
-            color: #333;
+            background: #000;
+            z-index: 1000;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            letter-spacing: 10px;
-            text-transform: uppercase;
-            z-index: 9999;
-            font-family: monospace;
+            color: #ff3e3e;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Mobil ve Tablet Uyumluluğu */
-        @media (max-width: 1024px) {
-            .counter-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .info-card {
-                padding: 2rem;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 1rem;
-                gap: 2rem;
-            }
-            .info-card h1 {
-                font-size: 1.5rem;
-            }
-            .info-card p {
-                font-size: 0.95rem;
-                text-align: left;
-                text-align-last: left;
-            }
-            .counter-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-            .counter-box {
-                padding: 1.5rem 0.5rem;
-            }
-            .value {
-                font-size: 2.8rem;
-            }
-            .label {
-                font-size: 0.7rem;
-                letter-spacing: 2px;
-            }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+            h1 { font-size: 1.1rem; letter-spacing: 5px; }
+            .unit-box .val { font-size: 1.8rem; }
+            .glass-card { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="main-content">
-        
-        <!-- Gizemli ama hiçbir şey anlatmayan metin bloğu -->
-        <div class="info-card glass-panel">
-            <h1>Referans Noktası</h1>
-            <p>
-                16 Şubat 2026, saat 19:15. Bu spesifik koordinat, yalnızca sıradan bir zaman diliminin başlangıcını değil; aynı zamanda beklenen süreçlerin geri dönülemez biçimde aktif hale geldiği ve önceki tüm parametrelerin geçerliliğini yitirdiği o kritik eşiği temsil eder. Neden bu denli hayati? Çünkü zamanın durmaksızın ilerleyen dokusu içinde bu nokta, gerçekleşmesi gereken akışın tetiklendiği yegane referans merkezidir. Sayaçta ilerleyen her bir saniye, bu noktanın zamansal düzlemde ne kadar geride kaldığını nicel olarak kanıtlarken, aslen o anın oluşturduğu etkinin sürekliliğini ve mevcut durumun yeni bir faza geçişini teyit etmektedir.
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <canvas id="starfield"></canvas>
+    <div class="scanlines"></div>
+
+    <div class="interface" id="app">
+        <div class="glass-card" id="main-card">
+            <div class="status-header">
+                <div><span class="sync-pulse"></span> SIGNAL: STABLE</div>
+                <div id="timestamp">16.02.2026 // 19:15</div>
+            </div>
+
+            <h1>Yörünge Kesişimi</h1>
+            
+            <p id="main-text">
+                Kozmik gürültünün ortasında, iki tekil sinyal aynı genlikte titreşmeye başladı. <span class="highlight">16.02 spektrumu</span> ve <span class="highlight">19:15 frekansı</span>, rastgeleliğin sona erdiği o mutlak anomali anıdır. Entropinin hüküm sürdüğü bu boşlukta, yörüngelerimizin birleşmesi bir hata değil; evrenin kendi kendini onarma biçimidir.
             </p>
+
+            <div class="grid">
+                <div class="unit-box"><span class="val" id="years">0</span><span class="label">Yıl</span></div>
+                <div class="unit-box"><span class="val" id="months">0</span><span class="label">Ay</span></div>
+                <div class="unit-box"><span class="val" id="days">0</span><span class="label">Gün</span></div>
+                <div class="unit-box"><span class="val" id="hours">00</span><span class="label">Saat</span></div>
+                <div class="unit-box"><span class="val" id="minutes">00</span><span class="label">Dakika</span></div>
+                <div class="unit-box"><span class="val" id="seconds">00</span><span class="label">Saniye</span></div>
+            </div>
         </div>
 
-        <!-- Premium Sayaç -->
-        <div class="counter-grid">
-            <div class="counter-box glass-panel">
-                <div class="value" id="years">0</div>
-                <div class="label">Yıl</div>
-            </div>
-            <div class="counter-box glass-panel">
-                <div class="value" id="months">0</div>
-                <div class="label">Ay</div>
-            </div>
-            <div class="counter-box glass-panel">
-                <div class="value" id="days">0</div>
-                <div class="label">Gün</div>
-            </div>
-            <div class="counter-box glass-panel">
-                <div class="value" id="hours">00</div>
-                <div class="label">Saat</div>
-            </div>
-            <div class="counter-box glass-panel">
-                <div class="value" id="minutes">00</div>
-                <div class="label">Dakika</div>
-            </div>
-            <div class="counter-box glass-panel">
-                <div class="value" id="seconds">00</div>
-                <div class="label">Saniye</div>
-            </div>
+        <div class="access-control">
+            <input type="password" id="key" class="key-input" placeholder="ACCESS_KEY">
         </div>
     </div>
 
-    <!-- Sistem Çıkış Ekranı -->
-    <div id="exit-screen">TERMINATED</div>
+    <div id="termination-screen">
+        <div style="letter-spacing: 10px; font-size: 1.5rem;">CONNECTION_LOST</div>
+        <div style="font-size: 0.6rem; margin-top: 10px; opacity: 0.5;">CRITICAL_FAILURE: LOCAL_STORAGE_WIPED</div>
+    </div>
 
     <script>
-        // 16 Şubat 2026, 19:15:00 (Türkiye Saati / UTC+3)
-        const startDate = new Date('2026-02-16T19:15:00+03:00');
+        // 1. IMPROVED STARFIELD
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
 
-        // Sayaç Güncelleme Fonksiyonu
-        function updateCounter() {
-            const now = new Date();
-            
-            // Eğer şu anki zaman başlangıç tarihinden gerideyken sıfır göster
-            if (now < startDate) {
-                document.getElementById('years').innerText = "0";
-                document.getElementById('months').innerText = "0";
-                document.getElementById('days').innerText = "0";
-                document.getElementById('hours').innerText = "00";
-                document.getElementById('minutes').innerText = "00";
-                document.getElementById('seconds').innerText = "00";
-                return;
-            }
-
-            // Doğru takvim hesaplaması için değişkenler
-            let years = now.getFullYear() - startDate.getFullYear();
-            let months = now.getMonth() - startDate.getMonth();
-            let days = now.getDate() - startDate.getDate();
-            let hours = now.getHours() - startDate.getHours();
-            let minutes = now.getMinutes() - startDate.getMinutes();
-            let seconds = now.getSeconds() - startDate.getSeconds();
-
-            // Saniye eksikse dakikadan borç al
-            if (seconds < 0) {
-                minutes--;
-                seconds += 60;
-            }
-            // Dakika eksikse saatten borç al
-            if (minutes < 0) {
-                hours--;
-                minutes += 60;
-            }
-            // Saat eksikse günden borç al
-            if (hours < 0) {
-                days--;
-                hours += 24;
-            }
-            // Gün eksikse aydan borç al
-            if (days < 0) {
-                months--;
-                // Bir önceki ayın toplam gününü bularak güne ekle
-                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-                days += prevMonth.getDate();
-            }
-            // Ay eksikse yıldan borç al
-            if (months < 0) {
-                years--;
-                months += 12;
-            }
-
-            // DOM'a yazdır (Tek hanelilerin başına sıfır koyarak)
-            document.getElementById('years').innerText = years;
-            document.getElementById('months').innerText = months;
-            document.getElementById('days').innerText = days;
-            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
-            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
-            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = Array.from({length: 250}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                z: Math.random() * canvas.width, // Depth
+                size: Math.random() * 1.5
+            }));
         }
 
-        // Sayacı saniyede bir çalıştır ve anında başlat
-        setInterval(updateCounter, 1000);
-        updateCounter();
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const midX = canvas.width / 2;
+            const midY = canvas.height / 2;
 
-        // ---------------------------------------------------------
-        // GİZLİ ÇIKIŞ KISAYOLU (Ctrl + Alt + Shift + F11 + F12)
-        // ---------------------------------------------------------
-        const keysPressed = {};
+            stars.forEach(s => {
+                s.z -= 0.2; // Move forward
+                if(s.z <= 0) s.z = canvas.width;
 
+                const sx = (s.x - midX) * (canvas.width / s.z) + midX;
+                const sy = (s.y - midY) * (canvas.width / s.z) + midY;
+                const size = s.size * (canvas.width / s.z);
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${1 - s.z / canvas.width})`;
+                ctx.fillRect(sx, sy, size, size);
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        animateStars();
+
+        // 2. CHRONO LOGIC & BREATHING
+        const startDate = new Date('2026-02-16T19:15:00+03:00');
+        const card = document.getElementById('main-card');
+
+        function update() {
+            const now = new Date();
+            if (now < startDate) return;
+
+            // Trigger visual breathe on every second
+            card.classList.toggle('pulse');
+
+            let y = now.getFullYear() - startDate.getFullYear();
+            let m = now.getMonth() - startDate.getMonth();
+            let d = now.getDate() - startDate.getDate();
+            let hh = now.getHours() - startDate.getHours();
+            let mm = now.getMinutes() - startDate.getMinutes();
+            let ss = now.getSeconds() - startDate.getSeconds();
+
+            if (ss < 0) { mm--; ss += 60; }
+            if (mm < 0) { hh--; mm += 60; }
+            if (hh < 0) { d--; hh += 24; }
+            if (d < 0) {
+                m--;
+                const prev = new Date(now.getFullYear(), now.getMonth(), 0);
+                d += prev.getDate();
+            }
+            if (m < 0) { y--; m += 12; }
+
+            updateVal('years', y);
+            updateVal('months', m);
+            updateVal('days', d);
+            updateVal('hours', String(hh).padStart(2, '0'));
+            updateVal('minutes', String(mm).padStart(2, '0'));
+            updateVal('seconds', String(ss).padStart(2, '0'));
+        }
+
+        function updateVal(id, value) {
+            const el = document.getElementById(id);
+            if(el.innerText !== String(value)) {
+                el.innerText = value;
+                el.classList.add('changing');
+                setTimeout(() => el.classList.remove('changing'), 200);
+            }
+        }
+
+        setInterval(update, 1000);
+        update();
+
+        // 3. RESONANCE FLICKER (Random Events)
+        setInterval(() => {
+            if(Math.random() > 0.97) {
+                card.classList.add('resonance-flicker');
+                setTimeout(() => card.classList.remove('resonance-flicker'), 150);
+            }
+        }, 3000);
+
+        // 4. SECRET REVEAL
+        const keyInput = document.getElementById('key');
+        const mainText = document.getElementById('main-text');
+        const title = document.querySelector('h1');
+        const validKeys = ['sifreneolsunbilmiyorum', 'oyuzdenbolebisikoydum', 'cokdegerlisinhanzade', 'senicokseviyorum'];
+
+        keyInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim().toLowerCase();
+            if (validKeys.includes(val)) {
+                e.target.parentElement.style.display = 'none';
+                title.innerText = "Hanzade & Eymen";
+                mainText.innerHTML = `Bu sayaç artık soğuk bir evrensel veriyi değil, bizim başladığımız o kusursuz anı temsil ediyor. <span class="highlight">16 Şubat 2026, 19:15...</span> İki yörüngenin sonsuza dek birleştiği o eşsiz kırılma noktası. Seni çok seviyorum Hanzade. Birlikte geçirdiğimiz her milisaniye, bu ekranda akan sayılardan çok daha derin ve kıymetli.`;
+            }
+        });
+
+        // TERMINATION
+        const keys = {};
         window.addEventListener('keydown', (e) => {
-            const keyName = e.key.toLowerCase();
-            keysPressed[keyName] = true;
-
-            // F11 ve F12 tarayıcı varsayılanlarını (tam ekran, devtools) ezmek için
-            if (keyName === 'f11' || keyName === 'f12') {
-                if (e.ctrlKey && e.altKey && e.shiftKey) {
-                    e.preventDefault();
-                }
-            }
-
-            // Mantık kontrolü: 3 modifier tuş basılı mı ve F11 ile F12 aktif mi?
-            if (e.ctrlKey && e.altKey && e.shiftKey && keysPressed['f11'] && keysPressed['f12']) {
-                e.preventDefault(); 
-                
-                // Ana arayüzü yok et
-                const mainContent = document.getElementById('main-content');
-                if (mainContent) {
-                    mainContent.remove(); // DOM'dan tamamen siliyoruz
-                }
-                
-                // Siyah çıkış ekranını aktif et
-                const exitScreen = document.getElementById('exit-screen');
-                exitScreen.style.display = 'flex';
-                document.body.style.background = '#000';
+            keys[e.key.toLowerCase()] = true;
+            if (e.ctrlKey && e.altKey && e.shiftKey && keys['f11'] && keys['f12']) {
+                document.getElementById('app').remove();
+                document.getElementById('termination-screen').style.display = 'flex';
             }
         });
-
-        // Tuş bırakıldığında nesneden false yap
-        window.addEventListener('keyup', (e) => {
-            keysPressed[e.key.toLowerCase()] = false;
-        });
-
+        window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
     </script>
 </body>
-  </html>
+</html>
