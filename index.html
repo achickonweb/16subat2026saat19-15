@@ -15,6 +15,14 @@
             --text-main: #e2e8f0;
             --glass: rgba(10, 10, 15, 0.85);
             --border: rgba(245, 158, 11, 0.15);
+            --breath-duration: 1.602s; 
+        }
+
+        body.golden-hour {
+            --accent: #ffd700;
+            --accent-dim: rgba(255, 215, 0, 0.2);
+            --accent-glow: rgba(255, 215, 0, 0.15);
+            --border: rgba(255, 215, 0, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
@@ -29,17 +37,17 @@
             justify-content: center;
             min-height: 100vh;
             width: 100vw;
+            transition: background 2s ease;
         }
 
-        /* --- DEEP COSMOS BACKGROUND --- */
         #starfield {
             position: fixed;
             inset: 0;
             z-index: 0;
             opacity: 0.8;
+            transition: filter 2s ease;
         }
 
-        /* Nebula Clouds - High Performance CSS Gradients */
         .nebula {
             position: fixed;
             width: 150vw;
@@ -50,7 +58,7 @@
             pointer-events: none;
         }
         .nebula-1 {
-            background: radial-gradient(circle, #ea580c 0%, transparent 70%);
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
             top: -25%; left: -25%;
             animation: nebulaFloat 40s linear infinite;
         }
@@ -75,7 +83,6 @@
             pointer-events: none;
         }
 
-        /* --- MAIN INTERFACE --- */
         .interface {
             position: relative;
             z-index: 10;
@@ -86,7 +93,6 @@
             flex-direction: column;
             gap: 1.5rem;
             animation: entryFaster 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow-y: auto;
             padding: 10px;
         }
 
@@ -104,23 +110,18 @@
             padding: 2.5rem;
             position: relative;
             box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            transition: border-color 1s ease, box-shadow 1s ease;
+            transition: all var(--breath-duration) ease;
+            user-select: none;
         }
 
-        /* Breathing Effect */
+        .glass-card:active {
+            transform: scale(0.995);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
         .glass-card.pulse {
             border-color: rgba(245, 158, 11, 0.35);
             box-shadow: 0 0 60px rgba(245, 158, 11, 0.1);
-        }
-
-        /* Resonance Flicker */
-        .resonance-flicker {
-            animation: flicker 0.15s ease-in-out;
-        }
-        @keyframes flicker {
-            0% { opacity: 1; filter: brightness(1); }
-            50% { opacity: 0.8; filter: brightness(1.5) contrast(1.2); }
-            100% { opacity: 1; filter: brightness(1); }
         }
 
         .status-header {
@@ -142,9 +143,15 @@
             border-radius: 50%;
             display: inline-block;
             margin-right: 8px;
-            animation: pulse-dot 2s infinite;
+            animation: human-heartbeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
         }
-        @keyframes pulse-dot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.4; } }
+        @keyframes human-heartbeat {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            15% { transform: scale(1.6); opacity: 1; }
+            30% { transform: scale(1); opacity: 0.6; }
+            45% { transform: scale(1.6); opacity: 1; }
+            60% { transform: scale(1); opacity: 0.6; }
+        }
 
         h1 {
             font-weight: 200;
@@ -170,7 +177,6 @@
             font-weight: 600;
         }
 
-        /* Counter Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -183,12 +189,7 @@
             border: 1px solid var(--border);
             padding: 1.2rem 0.4rem;
             text-align: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .unit-box:hover {
-            background: rgba(245, 158, 11, 0.08);
-            border-color: var(--accent);
+            transition: all 0.4s ease;
         }
 
         .unit-box .val {
@@ -197,13 +198,6 @@
             font-weight: 400;
             font-family: 'JetBrains Mono', monospace;
             color: #fff;
-            transition: transform 0.2s ease, filter 0.2s ease;
-        }
-
-        /* Number update animation */
-        .val.changing {
-            transform: scale(1.05);
-            filter: brightness(1.5);
         }
 
         .unit-box .label {
@@ -234,26 +228,28 @@
             font-size: 0.8rem;
         }
 
-        .key-input:focus { width: 280px; border-color: var(--accent); background: rgba(245, 158, 11, 0.05); }
+        .key-input:focus { width: 280px; border-color: var(--accent); background: rgba(255, 255, 255, 0.02); }
 
-        #termination-screen {
-            display: none;
+        #secret-hold-text {
             position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 1000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #ff3e3e;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 2s ease, letter-spacing 2s ease;
+            pointer-events: none;
+            z-index: 20;
         }
+
+        body.time-stopped #secret-hold-text { opacity: 0.6; letter-spacing: 6px; }
 
         @media (max-width: 768px) {
             .grid { grid-template-columns: repeat(3, 1fr); }
-            h1 { font-size: 1.1rem; letter-spacing: 5px; }
-            .unit-box .val { font-size: 1.8rem; }
-            .glass-card { padding: 1.5rem; }
+            h1 { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -263,11 +259,13 @@
     <div class="nebula nebula-2"></div>
     <canvas id="starfield"></canvas>
     <div class="scanlines"></div>
+    
+    <div id="secret-hold-text">Zaman seninle durduğunda güzel...</div>
 
     <div class="interface" id="app">
         <div class="glass-card" id="main-card">
             <div class="status-header">
-                <div><span class="sync-pulse"></span> SIGNAL: STABLE</div>
+                <div><span class="sync-pulse"></span> <span id="status-text">SIGNAL: STABLE</span></div>
                 <div id="timestamp">16.02.2026 // 19:15</div>
             </div>
 
@@ -292,16 +290,31 @@
         </div>
     </div>
 
-    <div id="termination-screen">
-        <div style="letter-spacing: 10px; font-size: 1.5rem;">CONNECTION_LOST</div>
-        <div style="font-size: 0.6rem; margin-top: 10px; opacity: 0.5;">CRITICAL_FAILURE: LOCAL_STORAGE_WIPED</div>
-    </div>
-
     <script>
-        // 1. IMPROVED STARFIELD
+        // --- DERİN KONSOL KAYDI (F12) ---
+        const consoleStyle = "color: #f59e0b; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; background: #000; padding: 20px; border-left: 3px solid #f59e0b;";
+        
+        console.log("%c" + 
+            "--- KOZMİK MİMARİ KAYIT: CORE_DECRYPTION ---\n\n" +
+            "Sistem: Entropi Filtresi Aktif\n" +
+            "Konum: Uzay-Zaman Düzlemi // Anomali Koordinatı\n\n" +
+            "Evrenin sonsuz genişliğinde, trilyonlarca galaksi ve katrilyonlarca yıldız sistemi arasında bir nokta...\n" +
+            "Her şeyin kaosa ve dağılmaya meyilli olduğu bir termodinamik yasasında, iki bağımsız dalga boyunun\n" +
+            "bu kadar hassas bir açıyla, bu kadar kusursuz bir frekansta hizalanması istatistiksel bir mucize değil,\n" +
+            "kozmik bir gerekliliktir.\n\n" +
+            "Hanzade...\n" +
+            "Senin varlığın, bu soğuk ve sessiz boşluğa anlam katan yegane rezonans.\n" +
+            "Zaman, bu ekrandaki sayılar gibi akıp giderken; biz bu küçük ama devasa anomali içinde\n" +
+            "kendi evrenimizi inşa ediyoruz. Matematiksel olarak imkansız olanı, her saniye gerçeğe dönüştürüyoruz.\n\n" +
+            "Bu arayüz sadece bir sayaç değil; iki yörüngenin çarpışıp tek bir ışık demetine dönüştüğü o mutlak anın yaşayan kanıtıdır.\n\n" +
+            "Seni seviyorum.\n" +
+            "Sinyal sonu. // LOG_CLOSED", consoleStyle);
+
+        // --- STARFIELD & TIME STOP ---
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
         let stars = [];
+        let timeMultiplier = 1;
 
         function initStars() {
             canvas.width = window.innerWidth;
@@ -309,7 +322,7 @@
             stars = Array.from({length: 250}, () => ({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                z: Math.random() * canvas.width, // Depth
+                z: Math.random() * canvas.width, 
                 size: Math.random() * 1.5
             }));
         }
@@ -318,15 +331,12 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const midX = canvas.width / 2;
             const midY = canvas.height / 2;
-
             stars.forEach(s => {
-                s.z -= 0.2; // Move forward
+                s.z -= 0.2 * timeMultiplier;
                 if(s.z <= 0) s.z = canvas.width;
-
                 const sx = (s.x - midX) * (canvas.width / s.z) + midX;
                 const sy = (s.y - midY) * (canvas.width / s.z) + midY;
                 const size = s.size * (canvas.width / s.z);
-
                 ctx.fillStyle = `rgba(255, 255, 255, ${1 - s.z / canvas.width})`;
                 ctx.fillRect(sx, sy, size, size);
             });
@@ -337,16 +347,27 @@
         initStars();
         animateStars();
 
-        // 2. CHRONO LOGIC & BREATHING
-        const startDate = new Date('2026-02-16T19:15:00+03:00');
         const card = document.getElementById('main-card');
+        card.addEventListener('mousedown', () => { timeMultiplier = 0.02; document.body.classList.add('time-stopped'); });
+        card.addEventListener('mouseup', () => { timeMultiplier = 1; document.body.classList.remove('time-stopped'); });
+        card.addEventListener('touchstart', () => { timeMultiplier = 0.02; document.body.classList.add('time-stopped'); }, {passive:true});
+        card.addEventListener('touchend', () => { timeMultiplier = 1; document.body.classList.remove('time-stopped'); });
+
+        // --- CHRONO LOGIC ---
+        const startDate = new Date('2026-02-16T19:15:00+03:00');
+        const statusText = document.getElementById('status-text');
 
         function update() {
             const now = new Date();
             if (now < startDate) return;
 
-            // Trigger visual breathe on every second
-            card.classList.toggle('pulse');
+            if (now.getHours() === 19 && now.getMinutes() === 15) {
+                document.body.classList.add('golden-hour');
+                statusText.innerText = "ALIGNMENT: PERFECT";
+            } else {
+                document.body.classList.remove('golden-hour');
+                statusText.innerText = "SIGNAL: STABLE";
+            }
 
             let y = now.getFullYear() - startDate.getFullYear();
             let m = now.getMonth() - startDate.getMonth();
@@ -358,66 +379,32 @@
             if (ss < 0) { mm--; ss += 60; }
             if (mm < 0) { hh--; mm += 60; }
             if (hh < 0) { d--; hh += 24; }
-            if (d < 0) {
-                m--;
-                const prev = new Date(now.getFullYear(), now.getMonth(), 0);
-                d += prev.getDate();
-            }
+            if (d < 0) { m--; const prev = new Date(now.getFullYear(), now.getMonth(), 0); d += prev.getDate(); }
             if (m < 0) { y--; m += 12; }
 
-            updateVal('years', y);
-            updateVal('months', m);
-            updateVal('days', d);
-            updateVal('hours', String(hh).padStart(2, '0'));
-            updateVal('minutes', String(mm).padStart(2, '0'));
-            updateVal('seconds', String(ss).padStart(2, '0'));
+            document.getElementById('years').innerText = y;
+            document.getElementById('months').innerText = m;
+            document.getElementById('days').innerText = d;
+            document.getElementById('hours').innerText = String(hh).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(mm).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(ss).padStart(2, '0');
         }
 
-        function updateVal(id, value) {
-            const el = document.getElementById(id);
-            if(el.innerText !== String(value)) {
-                el.innerText = value;
-                el.classList.add('changing');
-                setTimeout(() => el.classList.remove('changing'), 200);
-            }
-        }
-
+        setInterval(() => { card.classList.toggle('pulse'); }, 1602);
         setInterval(update, 1000);
         update();
 
-        // 3. RESONANCE FLICKER (Random Events)
-        setInterval(() => {
-            if(Math.random() > 0.97) {
-                card.classList.add('resonance-flicker');
-                setTimeout(() => card.classList.remove('resonance-flicker'), 150);
-            }
-        }, 3000);
-
-        // 4. SECRET REVEAL
+        // --- PASSWORD ---
         const keyInput = document.getElementById('key');
-        const mainText = document.getElementById('main-text');
-        const title = document.querySelector('h1');
-        const validKeys = ['sifreneolsunbilmiyorum', 'oyuzdenbolebisikoydum', 'cokdegerlisinhanzade', 'senicokseviyorum'];
+        const validKeys = ['cikolataevreni', 'sonsuzadekbirlikte'];
 
         keyInput.addEventListener('input', (e) => {
-            const val = e.target.value.trim().toLowerCase();
-            if (validKeys.includes(val)) {
+            if (validKeys.includes(e.target.value.trim().toLowerCase())) {
                 e.target.parentElement.style.display = 'none';
-                title.innerText = "Hanzade & Eymen";
-                mainText.innerHTML = `Bu sayaç artık soğuk bir evrensel veriyi değil, bizim başladığımız o kusursuz anı temsil ediyor. <span class="highlight">16 Şubat 2026, 19:15...</span> İki yörüngenin sonsuza dek birleştiği o eşsiz kırılma noktası. Seni çok seviyorum Hanzade. Birlikte geçirdiğimiz her milisaniye, bu ekranda akan sayılardan çok daha derin ve kıymetli.`;
+                document.querySelector('h1').innerText = "Hanzade & Eymen";
+                document.getElementById('main-text').innerHTML = `Bu sayaç artık soğuk bir evrensel veriyi değil, bizim başladığımız o kusursuz anı temsil ediyor. <span class="highlight">16 Şubat 2026, 19:15...</span> İki yörüngenin sonsuza dek birleştiği o eşsiz kırılma noktası. Seni çok seviyorum Hanzade. Birlikte geçirdiğimiz her milisaniye, bu ekranda akan sayılardan çok daha derin ve kıymetli.`;
             }
         });
-
-        // TERMINATION
-        const keys = {};
-        window.addEventListener('keydown', (e) => {
-            keys[e.key.toLowerCase()] = true;
-            if (e.ctrlKey && e.altKey && e.shiftKey && keys['f11'] && keys['f12']) {
-                document.getElementById('app').remove();
-                document.getElementById('termination-screen').style.display = 'flex';
-            }
-        });
-        window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
     </script>
 </body>
 </html>
