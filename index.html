@@ -8,6 +8,7 @@
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;400;700&family=Inter:wght@100;300;600&display=swap');
 
         :root {
+            /* Varsayılan (Gece) Renkleri */
             --bg-deep: #030305;
             --accent: #f59e0b;
             --accent-dim: rgba(245, 158, 11, 0.2);
@@ -16,28 +17,65 @@
             --glass: rgba(10, 10, 15, 0.85);
             --border: rgba(245, 158, 11, 0.15);
             --breath-duration: 1.602s; 
+            --nebula-1-color: #f59e0b;
+            --nebula-2-color: #4338ca;
         }
 
+        /* Gündüz Döngüsü Renkleri */
+        body.theme-dawn {
+            --bg-deep: #0f0a1c;
+            --accent: #ff8b6a;
+            --accent-dim: rgba(255, 139, 106, 0.2);
+            --accent-glow: rgba(255, 139, 106, 0.1);
+            --border: rgba(255, 139, 106, 0.2);
+            --nebula-1-color: #ff7b54;
+            --nebula-2-color: #93329e;
+        }
+        body.theme-day {
+            --bg-deep: #0a1128;
+            --accent: #00a8e8;
+            --accent-dim: rgba(0, 168, 232, 0.2);
+            --accent-glow: rgba(0, 168, 232, 0.1);
+            --border: rgba(0, 168, 232, 0.2);
+            --nebula-1-color: #4da8da;
+            --nebula-2-color: #007cc7;
+        }
+        body.theme-dusk {
+            --bg-deep: #1a0b1c;
+            --accent: #d859ff;
+            --accent-dim: rgba(216, 89, 255, 0.2);
+            --accent-glow: rgba(216, 89, 255, 0.1);
+            --border: rgba(216, 89, 255, 0.2);
+            --nebula-1-color: #ff4a4a;
+            --nebula-2-color: #6a0572;
+        }
+
+        /* Orijinal Golden Hour */
         body.golden-hour {
             --accent: #ffd700;
             --accent-dim: rgba(255, 215, 0, 0.2);
             --accent-glow: rgba(255, 215, 0, 0.15);
             --border: rgba(255, 215, 0, 0.3);
+            --nebula-1-color: #ffd700;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @media (pointer: fine) {
+            * { cursor: none !important; }
+        }
 
         body {
             background-color: var(--bg-deep);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             min-height: 100vh;
             width: 100vw;
-            transition: background 2s ease;
+            transition: background 3s ease;
         }
 
         #starfield {
@@ -56,14 +94,15 @@
             z-index: 1;
             opacity: 0.15;
             pointer-events: none;
+            transition: background 3s ease;
         }
         .nebula-1 {
-            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--nebula-1-color) 0%, transparent 70%);
             top: -25%; left: -25%;
             animation: nebulaFloat 40s linear infinite;
         }
         .nebula-2 {
-            background: radial-gradient(circle, #4338ca 0%, transparent 70%);
+            background: radial-gradient(circle, var(--nebula-2-color) 0%, transparent 70%);
             bottom: -25%; right: -25%;
             animation: nebulaFloat 60s linear reverse infinite;
         }
@@ -88,13 +127,18 @@
             z-index: 10;
             width: 95%;
             max-width: 900px;
-            max-height: 95vh;
+            margin: auto;
+            padding: 2rem 0;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
             animation: entryFaster 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 10px;
         }
+        
+        /* Özel Kaydırma Çubuğu */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; opacity: 0.5; }
 
         @keyframes entryFaster {
             from { opacity: 0; transform: scale(0.96) translateY(10px); filter: brightness(2) blur(10px); }
@@ -110,8 +154,23 @@
             padding: 2.5rem;
             position: relative;
             box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            transition: all var(--breath-duration) ease;
+            transition: all var(--breath-duration) ease, transform 0.2s ease;
             user-select: none;
+            overflow: hidden;
+        }
+
+        /* Mouse Takip Eden Işıltı Efekti */
+        .glass-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--accent-glow), transparent 40%);
+            z-index: -1;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+        .glass-card:hover::before {
+            opacity: 1;
         }
 
         .glass-card:active {
@@ -124,6 +183,20 @@
             box-shadow: 0 0 60px rgba(245, 158, 11, 0.1);
         }
 
+        /* Glitch Efekti */
+        .glitch-active {
+            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            filter: hue-rotate(90deg) contrast(150%);
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-3px, 3px) }
+            40% { transform: translate(-3px, -3px) }
+            60% { transform: translate(3px, 3px) }
+            80% { transform: translate(3px, -3px) }
+            100% { transform: translate(0) }
+        }
+
         .status-header {
             display: flex;
             justify-content: space-between;
@@ -134,6 +207,8 @@
             letter-spacing: 2px;
             color: var(--accent);
             opacity: 0.7;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .sync-pulse {
@@ -208,6 +283,33 @@
             opacity: 0.8;
         }
 
+        /* Kozmik İstatistikler HUD */
+        .cosmic-stats {
+            display: none; /* Şifre sonrası açılacak */
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            padding-top: 2rem;
+        }
+        .stat-item {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-val {
+            font-size: 1rem;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.5rem;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
         .access-control {
             margin-top: 1rem;
             display: flex;
@@ -224,11 +326,12 @@
             letter-spacing: 4px;
             outline: none;
             transition: 0.4s;
-            width: 180px;
-            font-size: 0.8rem;
+            width: 100%;
+            max-width: 220px;
+            font-size: 16px; /* iOS/Mobil oto-zoom engellemesi için sabit 16px */
         }
 
-        .key-input:focus { width: 280px; border-color: var(--accent); background: rgba(255, 255, 255, 0.02); }
+        .key-input:focus { max-width: 280px; border-color: var(--accent); background: rgba(255, 255, 255, 0.02); }
 
         #secret-hold-text {
             position: fixed;
@@ -247,13 +350,102 @@
 
         body.time-stopped #secret-hold-text { opacity: 0.6; letter-spacing: 6px; }
 
+        /* Zaman Kapsülü UI */
+        .capsule-container {
+            display: none;
+            margin-top: 1.5rem;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .capsule-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+            padding: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+        }
+        .capsule-input:focus { border-color: var(--accent-dim); }
+        .capsule-btn {
+            background: transparent;
+            border: 1px solid var(--accent-dim);
+            color: var(--accent);
+            padding: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .capsule-btn:hover { background: var(--accent-dim); color: #fff; }
+
+        /* Kozmik Şans Uyarısı */
+        #wish-alert {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent);
+            color: var(--bg-deep);
+            padding: 10px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            z-index: 100;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* Özel İmleç (Custom Cursor) */
+        .cursor-ring {
+            position: fixed; width: 24px; height: 24px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none; z-index: 9999;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            mix-blend-mode: screen;
+        }
+        .cursor-dot {
+            position: fixed; width: 4px; height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none; z-index: 9999;
+        }
+        body.time-stopped .cursor-ring { width: 40px; height: 40px; background-color: var(--accent-glow); border-color: transparent; }
+
+        /* Mobilde (dokunmatiklerde) sahte imleci tamamen gizle */
+        @media (pointer: coarse) {
+            .cursor-ring, .cursor-dot { display: none !important; }
+        }
+
         @media (max-width: 768px) {
-            .grid { grid-template-columns: repeat(3, 1fr); }
-            h1 { font-size: 1.1rem; }
+            .glass-card { padding: 1.5rem 1rem; }
+            .grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1.5rem; }
+            .unit-box { padding: 0.8rem 0.2rem; }
+            .unit-box .val { font-size: 1.4rem; }
+            .unit-box .label { font-size: 0.45rem; }
+            h1 { font-size: 1.2rem; letter-spacing: 5px; margin-bottom: 0.8rem; }
+            p#main-text { font-size: 0.85rem; line-height: 1.6; }
+            .status-header { flex-direction: column; gap: 8px; text-align: center; justify-content: center; }
+            .cosmic-stats { grid-template-columns: 1fr; gap: 1rem; }
+            .key-input:focus { max-width: 100%; }
+            #secret-hold-text { bottom: 15px; font-size: 0.6rem; letter-spacing: 2px; text-align: center; width: 90%; }
         }
     </style>
 </head>
 <body>
+
+    <div class="cursor-ring" id="cursor-ring"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
 
     <div class="nebula nebula-1"></div>
     <div class="nebula nebula-2"></div>
@@ -261,15 +453,17 @@
     <div class="scanlines"></div>
     
     <div id="secret-hold-text">Zaman seninle durduğunda güzel...</div>
+    <div id="wish-alert">BİR DİLEK TUT 🌠</div>
 
     <div class="interface" id="app">
         <div class="glass-card" id="main-card">
             <div class="status-header">
-                <div><span class="sync-pulse"></span> <span id="status-text">SIGNAL: STABLE</span></div>
+                <div><span class="sync-pulse"></span> <span id="status-text">SIGNAL: SEARCHING...</span></div>
+                <div id="location-text">Kozmik Koordinat Taranıyor...</div>
                 <div id="timestamp">16.02.2026 // 19:15</div>
             </div>
 
-            <h1>Yörünge Kesişimi</h1>
+            <h1 id="main-title">Yörünge Kesişimi</h1>
             
             <p id="main-text">
                 Kozmik gürültünün içinde, iki başına buyruk sinyal aynı anda aynı genlikte titreşti. <span class="highlight">16.02 spektrumu</span>, <span class="highlight">19:15 frekansı</span> — rastgeleliğin çöktüğü o tek an. Bu bir çarpışma değildi, bir hata hiç değil. Entropinin hüküm sürdüğü boşlukta iki yörüngenin kesişmesi, evrenin kendi kendini sessizce düzeltme biçimiydi. Bilen anlar. Bilmeyen sadece gürültü duyar.
@@ -283,9 +477,29 @@
                 <div class="unit-box"><span class="val" id="minutes">00</span><span class="label">Dakika</span></div>
                 <div class="unit-box"><span class="val" id="seconds">00</span><span class="label">Saniye</span></div>
             </div>
+
+            <div class="cosmic-stats" id="cosmic-stats">
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-heart">0</span>
+                    <span class="stat-label">Kalp Atışı</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-earth">0 km</span>
+                    <span class="stat-label">Dünya'nın Kat Ettiği Yol</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-light">0 km</span>
+                    <span class="stat-label">Işığın Ulaştığı Mesafe</span>
+                </div>
+            </div>
+
+            <div class="capsule-container" id="capsule-container">
+                <textarea class="capsule-input" id="capsule-text" placeholder="Geleceğe, yörünge arkadaşına bir mesaj bırak..."></textarea>
+                <button class="capsule-btn" id="capsule-save">ZAMAN KAPSÜLÜNÜ MÜHÜRLE</button>
+            </div>
         </div>
 
-        <div class="access-control">
+        <div class="access-control" id="access-control">
             <input type="password" id="key" class="key-input" placeholder="ACCESS_KEY">
         </div>
     </div>
@@ -310,20 +524,166 @@
             "Seni seviyorum.\n" +
             "Sinyal sonu. // LOG_CLOSED", consoleStyle);
 
-        // --- STARFIELD & TIME STOP ---
+        // --- WEB AUDIO API (Ses ve Atmosfer) ---
+        let audioCtx;
+        let ambientOscillator;
+        let isAudioInitialized = false;
+
+        function initAudio() {
+            if (isAudioInitialized) return;
+            isAudioInitialized = true;
+            
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Derin uzay ambiyansı (Lo-Fi Drone)
+            ambientOscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            ambientOscillator.type = 'sine';
+            ambientOscillator.frequency.setValueAtTime(55, audioCtx.currentTime); // Çok düşük frekans
+            
+            // Yavaşça sesi artır
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 5);
+            
+            ambientOscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            ambientOscillator.start();
+        }
+
+        function playKeystrokeBeep() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800 + Math.random() * 200, audioCtx.currentTime); // Rastgele telsiz bip frekansı
+            
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // İlk etkileşimde sesi başlat
+        document.body.addEventListener('click', initAudio, { once: true });
+        document.body.addEventListener('keydown', initAudio, { once: true });
+
+        // --- HAPTİK GERİ BİLDİRİM ---
+        function triggerVibration(pattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        // --- LOKASYON BAZLI SELAMLAMA ---
+        const locationText = document.getElementById('location-text');
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // Tersine Geocoding için ücretsiz API (İstemci tabanlı)
+                    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=tr`)
+                        .then(res => res.json())
+                        .then(data => {
+                            const city = data.city || data.principalSubdivision || "Dünya";
+                            locationText.innerText = `${city.toUpperCase()} SEMALARINDA SİNYAL SENKRONİZE EDİLDİ`;
+                        })
+                        .catch(() => {
+                            locationText.innerText = `SİNYAL YEREL KOORDİNATLARDA KİLİTLENDİ`;
+                        });
+                },
+                (error) => {
+                    locationText.innerText = "LOKASYON GİZLİ // SİNYAL ANONİM";
+                }
+            );
+        } else {
+            locationText.innerText = "SİNYAL SENKRONİZE EDİLDİ";
+        }
+
+        // --- GECE/GÜNDÜZ MODU ---
+        function updateTimeTheme() {
+            const hour = new Date().getHours();
+            document.body.className = ''; // Mevcut temaları temizle
+            
+            if (hour >= 6 && hour < 10) {
+                document.body.classList.add('theme-dawn');
+            } else if (hour >= 10 && hour < 17) {
+                document.body.classList.add('theme-day');
+            } else if (hour >= 17 && hour < 20) {
+                document.body.classList.add('theme-dusk');
+            } else {
+                // Gece modu (Varsayılan)
+            }
+        }
+        updateTimeTheme(); // Başlangıçta çalıştır
+
+        // --- ÖZEL İMLEÇ, KART PARLAMASI & METİN DEŞİFRE (SCRAMBLE) ---
+        const cursorRing = document.getElementById('cursor-ring');
+        const cursorDot = document.getElementById('cursor-dot');
+        const mainCard = document.getElementById('main-card');
+
+        document.addEventListener('mousemove', (e) => {
+            if (window.matchMedia("(pointer: fine)").matches) {
+                cursorRing.style.left = `${e.clientX}px`;
+                cursorRing.style.top = `${e.clientY}px`;
+                cursorDot.style.left = `${e.clientX}px`;
+                cursorDot.style.top = `${e.clientY}px`;
+            }
+            
+            // Kart içindeki mouse ışıltısı
+            const rect = mainCard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            mainCard.style.setProperty('--mouse-x', `${x}px`);
+            mainCard.style.setProperty('--mouse-y', `${y}px`);
+        });
+
+        function scrambleText(elementId, newText) {
+            const element = document.getElementById(elementId);
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*&%';
+            let iterations = 0;
+            const interval = setInterval(() => {
+                element.innerText = newText.split('').map((char, index) => {
+                    if(char === ' ') return ' ';
+                    if(index < iterations) return newText[index];
+                    return chars[Math.floor(Math.random() * chars.length)];
+                }).join('');
+                if(iterations >= newText.length) clearInterval(interval);
+                iterations += 1/3; // Deşifre hızı
+            }, 30);
+        }
+
+        // --- STARFIELD & MOUSE GRAVITY & KOZMİK ŞANS ---
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
         let stars = [];
         let timeMultiplier = 1;
+        
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        
+        // Meteor Değişkenleri
+        let meteor = null;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
 
         function initStars() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            stars = Array.from({length: 250}, () => ({
+            stars = Array.from({length: 300}, () => ({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
                 z: Math.random() * canvas.width, 
-                size: Math.random() * 1.5
+                size: Math.random() * 1.5,
+                baseX: 0,
+                baseY: 0
             }));
         }
 
@@ -331,80 +691,249 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const midX = canvas.width / 2;
             const midY = canvas.height / 2;
+            
+            // Normal Yıldızlar ve Çekim Alanı
             stars.forEach(s => {
                 s.z -= 0.2 * timeMultiplier;
-                if(s.z <= 0) s.z = canvas.width;
-                const sx = (s.x - midX) * (canvas.width / s.z) + midX;
-                const sy = (s.y - midY) * (canvas.width / s.z) + midY;
+                if(s.z <= 0) {
+                    s.z = canvas.width;
+                    s.x = Math.random() * canvas.width;
+                    s.y = Math.random() * canvas.height;
+                }
+                
+                let sx = (s.x - midX) * (canvas.width / s.z) + midX;
+                let sy = (s.y - midY) * (canvas.width / s.z) + midY;
+                
+                // Mouse Çekim Alanı (Gravity) Etkisi
+                const dx = mouseX - sx;
+                const dy = mouseY - sy;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 150 && timeMultiplier === 1) {
+                    const force = (150 - distance) / 150;
+                    sx += dx * force * 0.05;
+                    sy += dy * force * 0.05;
+                }
+
                 const size = s.size * (canvas.width / s.z);
                 ctx.fillStyle = `rgba(255, 255, 255, ${1 - s.z / canvas.width})`;
-                ctx.fillRect(sx, sy, size, size);
+                ctx.beginPath();
+                ctx.arc(sx, sy, size, 0, Math.PI * 2);
+                ctx.fill();
             });
+
+            // Kozmik Şans: Meteor Mantığı
+            if (!meteor && Math.random() < 0.001) { // %0.1 ihtimalle her frame'de meteor çıkabilir
+                meteor = {
+                    x: Math.random() * canvas.width,
+                    y: -50,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: 15 + Math.random() * 10,
+                    length: 80 + Math.random() * 100,
+                    opacity: 1
+                };
+            }
+
+            if (meteor) {
+                ctx.beginPath();
+                ctx.moveTo(meteor.x, meteor.y);
+                ctx.lineTo(meteor.x - meteor.vx * (meteor.length / 10), meteor.y - meteor.vy * (meteor.length / 10));
+                ctx.strokeStyle = `rgba(255, 255, 255, ${meteor.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                meteor.x += meteor.vx;
+                meteor.y += meteor.vy;
+
+                if (meteor.y > canvas.height + 100 || meteor.x < -100 || meteor.x > canvas.width + 100) {
+                    meteor = null; // Ekrandan çıktı
+                }
+            }
+
             requestAnimationFrame(animateStars);
         }
 
-        window.addEventListener('resize', initStars);
+        let lastWidth = window.innerWidth;
+        window.addEventListener('resize', () => {
+            // Sadece genişlik değiştiğinde (ekran çevrildiğinde vs) yıldızları sıfırla. 
+            // Bu, mobilde klavye açılıp kapandığındaki atlamaları çözer.
+            if (window.innerWidth !== lastWidth) {
+                lastWidth = window.innerWidth;
+                initStars();
+            }
+        });
+        
         initStars();
         animateStars();
 
-        const card = document.getElementById('main-card');
-        card.addEventListener('mousedown', () => { timeMultiplier = 0.02; document.body.classList.add('time-stopped'); });
-        card.addEventListener('mouseup', () => { timeMultiplier = 1; document.body.classList.remove('time-stopped'); });
-        card.addEventListener('touchstart', () => { timeMultiplier = 0.02; document.body.classList.add('time-stopped'); }, {passive:true});
-        card.addEventListener('touchend', () => { timeMultiplier = 1; document.body.classList.remove('time-stopped'); });
+        // Meteor Yakalama Olayı
+        canvas.addEventListener('click', (e) => {
+            if (meteor) {
+                const dist = Math.sqrt(Math.pow(e.clientX - meteor.x, 2) + Math.pow(e.clientY - meteor.y, 2));
+                if (dist < 150) { // Meteorun yakınlarına tıklandıysa
+                    const alertBox = document.getElementById('wish-alert');
+                    alertBox.style.opacity = 1;
+                    triggerVibration([50, 50, 50]);
+                    meteor.opacity = 0; // Meteoru patlat/gizle
+                    setTimeout(() => { alertBox.style.opacity = 0; meteor = null; }, 3000);
+                }
+            }
+        });
 
-        // --- CHRONO LOGIC ---
-        const startDate = new Date('2026-02-16T19:15:00+03:00');
+        // Zaman Durdurma Etkileşimi
+        const card = document.getElementById('main-card');
+        const startTimeStop = () => { timeMultiplier = 0.02; document.body.classList.add('time-stopped'); triggerVibration(50); };
+        const endTimeStop = () => { timeMultiplier = 1; document.body.classList.remove('time-stopped'); };
+        
+        card.addEventListener('mousedown', startTimeStop);
+        card.addEventListener('mouseup', endTimeStop);
+        card.addEventListener('mouseleave', endTimeStop);
+        card.addEventListener('touchstart', startTimeStop, {passive:true});
+        card.addEventListener('touchend', endTimeStop);
+
+        // --- CHRONO LOGIC & KOZMİK İSTATİSTİKLER ---
+        const targetDate = new Date('2026-02-16T19:15:00+03:00');
         const statusText = document.getElementById('status-text');
+        
+        // Elementler
+        const elYears = document.getElementById('years');
+        const elMonths = document.getElementById('months');
+        const elDays = document.getElementById('days');
+        const elHours = document.getElementById('hours');
+        const elMinutes = document.getElementById('minutes');
+        const elSeconds = document.getElementById('seconds');
+        
+        const statHeart = document.getElementById('stat-heart');
+        const statEarth = document.getElementById('stat-earth');
+        const statLight = document.getElementById('stat-light');
+
+        let isCountingDown = false;
 
         function update() {
             const now = new Date();
-            if (now < startDate) return;
+            let diffMs = now - targetDate;
 
-            if (now.getHours() === 19 && now.getMinutes() === 15) {
-                document.body.classList.add('golden-hour');
-                statusText.innerText = "ALIGNMENT: PERFECT";
+            if (diffMs < 0) {
+                // Hedef tarih gelmediyse: GERİ SAYIM MODU
+                isCountingDown = true;
+                diffMs = Math.abs(diffMs);
+                statusText.innerText = "KESİŞİME KALAN SÜRE";
             } else {
-                document.body.classList.remove('golden-hour');
-                statusText.innerText = "SIGNAL: STABLE";
+                // Hedef tarih geçtiyse: İLERİ SAYIM MODU (Senkronizasyon)
+                isCountingDown = false;
+                if (now.getHours() === 19 && now.getMinutes() === 15) {
+                    document.body.classList.add('golden-hour');
+                    statusText.innerText = "ALIGNMENT: PERFECT";
+                } else {
+                    document.body.classList.remove('golden-hour');
+                    statusText.innerText = "SIGNAL: STABLE";
+                }
             }
 
-            let y = now.getFullYear() - startDate.getFullYear();
-            let m = now.getMonth() - startDate.getMonth();
-            let d = now.getDate() - startDate.getDate();
-            let hh = now.getHours() - startDate.getHours();
-            let mm = now.getMinutes() - startDate.getMinutes();
-            let ss = now.getSeconds() - startDate.getSeconds();
+            // Toplam saniye üzerinden istatistik hesaplama (Sadece ileri sayımda mantıklı, ama geri sayımda da "kalan mesafe" olarak gösterilebilir)
+            const totalSeconds = Math.floor(Math.abs((now - targetDate) / 1000));
+            const totalMinutes = Math.floor(totalSeconds / 60);
+
+            // Kozmik Hesaplamalar
+            const heartBeats = totalMinutes * 80; // Dakikada 80 atım
+            const earthTravel = totalSeconds * 29.78; // Dünya saniyede 29.78 km yol alır
+            const lightTravel = totalSeconds * 299792; // Işık hızı km/s
+
+            statHeart.innerText = heartBeats.toLocaleString('tr-TR');
+            statEarth.innerText = Math.floor(earthTravel).toLocaleString('tr-TR') + " km";
+            statLight.innerText = Math.floor(lightTravel).toLocaleString('tr-TR') + " km";
+
+            // Yıl, Ay, Gün hesaplama (İleri veya Geri)
+            let d1 = isCountingDown ? now : targetDate;
+            let d2 = isCountingDown ? targetDate : now;
+
+            let y = d2.getFullYear() - d1.getFullYear();
+            let m = d2.getMonth() - d1.getMonth();
+            let d = d2.getDate() - d1.getDate();
+            let hh = d2.getHours() - d1.getHours();
+            let mm = d2.getMinutes() - d1.getMinutes();
+            let ss = d2.getSeconds() - d1.getSeconds();
 
             if (ss < 0) { mm--; ss += 60; }
             if (mm < 0) { hh--; mm += 60; }
             if (hh < 0) { d--; hh += 24; }
-            if (d < 0) { m--; const prev = new Date(now.getFullYear(), now.getMonth(), 0); d += prev.getDate(); }
+            if (d < 0) { 
+                m--; 
+                const prev = new Date(d2.getFullYear(), d2.getMonth(), 0); 
+                d += prev.getDate(); 
+            }
             if (m < 0) { y--; m += 12; }
 
-            document.getElementById('years').innerText = y;
-            document.getElementById('months').innerText = m;
-            document.getElementById('days').innerText = d;
-            document.getElementById('hours').innerText = String(hh).padStart(2, '0');
-            document.getElementById('minutes').innerText = String(mm).padStart(2, '0');
-            document.getElementById('seconds').innerText = String(ss).padStart(2, '0');
+            elYears.innerText = y;
+            elMonths.innerText = m;
+            elDays.innerText = d;
+            elHours.innerText = String(hh).padStart(2, '0');
+            elMinutes.innerText = String(mm).padStart(2, '0');
+            elSeconds.innerText = String(ss).padStart(2, '0');
         }
 
         setInterval(() => { card.classList.toggle('pulse'); }, 1602);
         setInterval(update, 1000);
-        update();
+        update(); // İlk render
 
-        // --- PASSWORD ---
+        // --- PASSWORD, WARP SPEED & GLITCH ---
         const keyInput = document.getElementById('key');
         const validKeys = ['cikolataevreni', 'sonsuzadekbirlikte'];
 
+        keyInput.addEventListener('keydown', () => {
+            playKeystrokeBeep(); // Her tuşta ses
+        });
+
         keyInput.addEventListener('input', (e) => {
             if (validKeys.includes(e.target.value.trim().toLowerCase())) {
-                e.target.parentElement.style.display = 'none';
-                document.querySelector('h1').innerText = "Hanzade & Eymen";
-                document.getElementById('main-text').innerHTML = `Bu sayaç artık soğuk bir evrensel veriyi değil, bizim başladığımız o kusursuz anı temsil ediyor. <span class="highlight">16 Şubat 2026, 19:15...</span> İki yörüngenin sonsuza dek birleştiği o eşsiz kırılma noktası. Seni çok seviyorum Hanzade. Birlikte geçirdiğimiz her milisaniye, bu ekranda akan sayılardan çok daha derin ve kıymetli.`;
+                
+                // 1. Warp Speed & Titreşim
+                timeMultiplier = 20;
+                triggerVibration([100, 50, 100, 50, 200]);
+                
+                // 2. Glitch Efekti
+                const appContainer = document.getElementById('app');
+                appContainer.classList.add('glitch-active');
+                
+                // 3. Geçiş Animasyonu ve Veri Gösterimi
+                setTimeout(() => {
+                    timeMultiplier = 1; // Hızı normale döndür
+                    appContainer.classList.remove('glitch-active');
+                    
+                    document.getElementById('access-control').style.display = 'none';
+                    
+                    // Scramble efekti ile başlık değiştirme
+                    scrambleText('main-title', 'HANZADE & EYMEN');
+                    
+                    document.getElementById('main-text').innerHTML = `Bu sayaç artık soğuk bir evrensel veriyi değil, bizim başladığımız o kusursuz anı temsil ediyor. <span class="highlight">16 Şubat 2026, 19:15...</span> İki yörüngenin sonsuza dek birleştiği o eşsiz kırılma noktası. Seni çok seviyorum Hanzade. Birlikte geçirdiğimiz her milisaniye, bu ekranda akan sayılardan çok daha derin ve kıymetli.`;
+                    
+                    // İstatistikleri ve Kapsülü Göster
+                    document.getElementById('cosmic-stats').style.display = 'grid';
+                    document.getElementById('capsule-container').style.display = 'flex';
+                    
+                    // Kaydedilmiş kapsül mesajı varsa getir
+                    const savedMessage = localStorage.getItem('hanzade_capsule');
+                    if (savedMessage) {
+                        document.getElementById('capsule-text').value = savedMessage;
+                    }
+
+                }, 1500); // 1.5 saniye warp speed sürer
             }
         });
+
+        // --- ZAMAN KAPSÜLÜ KAYIT ---
+        document.getElementById('capsule-save').addEventListener('click', () => {
+            const text = document.getElementById('capsule-text').value;
+            localStorage.setItem('hanzade_capsule', text);
+            
+            const btn = document.getElementById('capsule-save');
+            btn.innerText = "MÜHÜRLENDİ // YILDIZLARA KAYDEDİLDİ";
+            triggerVibration(50);
+            setTimeout(() => {
+                btn.innerText = "ZAMAN KAPSÜLÜNÜ MÜHÜRLE";
+            }, 3000);
+        });
+
     </script>
 </body>
 </html>
