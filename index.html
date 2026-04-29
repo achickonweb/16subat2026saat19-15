@@ -878,7 +878,7 @@
 
         // --- PASSWORD, WARP SPEED & GLITCH ---
         const keyInput = document.getElementById('key');
-        const validKeys = ['cikolataevreni', 'sonsuzadekbirlikte'];
+        const validKeys = [atob("Y2lrb2xhdGFldnJlbmk="), atob("c29uc3V6YWRla2Jpcmxpa3Rl")];
 
         keyInput.addEventListener('keydown', () => {
             playKeystrokeBeep(); // Her tuşta ses
@@ -902,11 +902,11 @@
                     
                     document.getElementById('access-control').style.display = 'none';
                     
-                    // Scramble efekti ile başlık değiştirme
-                    scrambleText('main-title', 'HANZADE & EYMEN');
-                    
-                    document.getElementById('main-text').innerHTML = `Bu sayaç artık soğuk bir evrensel veriyi değil, bizim başladığımız o kusursuz anı temsil ediyor. <span class="highlight">16 Şubat 2026, 19:15...</span> İki yörüngenin sonsuza dek birleştiği o eşsiz kırılma noktası. Seni çok seviyorum Hanzade. Birlikte geçirdiğimiz her milisaniye, bu ekranda akan sayılardan çok daha derin ve kıymetli.`;
-                    
+                    const titleDecoded = atob('SEFOWkFERSAmIEVZTUVO');
+                    const textDecoded = atob('QnUgc2F5YcOnIGFydMSxayBzb8Sf dWsgYmlyIGV2cmVuc2VsIHZlcml5aSBkZcSfaWwsIGJpemltIGJhxZ9sYWRxxJ/EsW3EsXogbyBrdXN1cnN1eiBhbsSxIHRlbXNpbCBlZGl5b3IuIDxzcGFuIGNsYXNzPSJoaWdobGlnaHQiPjE2IMWedWJhdCAyMDI2LCAxOToxNS4uLjwvc3Bhbj4gxLBraSB5w7Zyw7xuZ2VuaW4gc29uc3V6YSBkZWsgYmlybGXFn3RpZ2kgbysgZcWfc2l6IGvEsXLEsWxtYSBub2t0YXPEsS4gU2VuaSDDp29rIHNldml5b3J1bSBIYW56YWRlLiBCaXJsaWt0ZSBnZcOnaXJkacSfaW1peiBoZXIgbWlsaXNhbml5ZSwgYnUgZWtyYW5kZSBha2FuIHNhecSxbGFyZGFuIMOnb2sgZGFoYSBkZXJpbiB2ZSBrxLF5bWV0bGku');
+
+                    scrambleText('main-title', titleDecoded);
+                    document.getElementById('main-text').innerHTML = textDecoded;
                     // İstatistikleri ve Kapsülü Göster
                     document.getElementById('cosmic-stats').style.display = 'grid';
                     document.getElementById('capsule-container').style.display = 'flex';
